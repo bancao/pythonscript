@@ -25,14 +25,22 @@ def get_page_articles(page_link):
     }
     page = BeautifulSoup(soup_wrapper.getPageContent(page_link, req_header))
     article_spans = page.findAll(attrs={"class" : "link_title"})
+    index = 0
     for article_span in article_spans :
+        if index == 0 : 
+            index = index + 1
+            continue
+            
         article_link = "http://blog.csdn.net%s" %article_span.a["href"]
         print article_link
         article = BeautifulSoup(soup_wrapper.getPageContent(article_link, req_header), convertEntities=BeautifulSoup.HTML_ENTITIES)
-        content = article.find(attrs={"id" : "article_content"})
-        print content.get_text()
+        title = article.find('h1')
+        parags = article.findAll("p")
+        print title.text
+        for parag  in parags : 
+            print parag.text
         break
-
+    
 if __name__ == '__main__':
    lists = get_all_pages()
    get_page_articles(lists[0])
