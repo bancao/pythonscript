@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import StringIO
 import datetime
 import re
@@ -5,9 +6,6 @@ import time
 import urllib2
 
 from BeautifulSoup import BeautifulSoup, Comment, Tag
-
-from utils import soup_wrapper
-from utils.soup_wrapper import getPageContent
 
 
 def get_all_pages():
@@ -23,7 +21,7 @@ def get_page_articles(page_link):
     'Connection':'close',
     'Referer':None
     }
-    page = BeautifulSoup(soup_wrapper.getPageContent(page_link, req_header))
+    page = BeautifulSoup(getPageContent(page_link, req_header))
     article_spans = page.findAll(attrs={"class" : "link_title"})
     index = 0
     for article_span in article_spans :
@@ -33,7 +31,7 @@ def get_page_articles(page_link):
             
         article_link = "http://blog.csdn.net%s" %article_span.a["href"]
         print article_link
-        article = BeautifulSoup(soup_wrapper.getPageContent(article_link, req_header), convertEntities=BeautifulSoup.HTML_ENTITIES)
+        article = BeautifulSoup(getPageContent(article_link, req_header), convertEntities=BeautifulSoup.HTML_ENTITIES)
         title = article.find('h1')
         parags = article.findAll("p")
         print title.text
@@ -41,6 +39,16 @@ def get_page_articles(page_link):
             print parag.text
         break
     
+def getPageContent(link, req_header):
+        try :
+            req_timeout=1000
+            req=urllib2.Request(link, None, req_header)
+            resp=urllib2.urlopen(req, None, req_timeout)
+            html = resp.read()
+        except Exception,ex:
+            html = ""
+        html = unicode(html, "utf8")
+        return html   
 if __name__ == '__main__':
    lists = get_all_pages()
    get_page_articles(lists[0])

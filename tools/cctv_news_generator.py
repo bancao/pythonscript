@@ -10,8 +10,6 @@ from BeautifulSoup import BeautifulSoup, Comment
 from docx import Document
 from docx.shared import Inches
 
-from utils import soup_wrapper
-
 
 def downloadTodayNews():
     currentTime = datetime.date.today()
@@ -28,7 +26,7 @@ def downloadTodayNews():
         'Referer':None
         }
     
-    soup = BeautifulSoup(soup_wrapper.getPageContent(url, req_header))
+    soup = BeautifulSoup(getPageContent(url, req_header))
     getnewslist = soup.findAll(attrs={"class" : "title2 fs_14"})
 
     with open(strTime+'.html','w') as f:
@@ -36,13 +34,22 @@ def downloadTodayNews():
             for news in i.findAll('li'):
                 artileUrl = news.find("a").get("href");
                 print artileUrl
-                article_soup = BeautifulSoup(soup_wrapper.getPageContent(artileUrl, req_header))
+                article_soup = BeautifulSoup(getPageContent(artileUrl, req_header))
                 text = article_soup.find(attrs={"class" : 'body'})
                 f.write('<b>'+news.find("a").contents[0].encode('gb2312')+'</b>'+'\n')
                 f.write('<div class="body">')
                 f.write(text.text.encode("gb2312") + "</div>" + '\n')
     
-
+def getPageContent(link, req_header):
+        try :
+            req_timeout=1000
+            req=urllib2.Request(link, None, req_header)
+            resp=urllib2.urlopen(req, None, req_timeout)
+            html = resp.read()
+        except Exception,ex:
+            html = ""
+        html = unicode(html, "utf8")
+        return html
 
 if __name__ == '__main__':
     downloadTodayNews()

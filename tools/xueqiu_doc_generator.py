@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import urllib2
 
 from BeautifulSoup import BeautifulSoup, Comment
@@ -5,8 +6,6 @@ from docx import Document
 from docx.shared import Inches
 import StringIO
 import json
-from utils import soup_wrapper
-
 
 req_header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122 Safari/537.36',
 'Accept':'text/html;q=0.9,*/*;q=0.8',
@@ -42,7 +41,7 @@ def findLinksAndGenDocs(authors):
 
 
 def parsePageAndGenDocFile(link):
-    cotent = soup_wrapper.getPageContent(link, req_header)
+    cotent = getPageContent(link, req_header)
     if cotent == "" :
         return
     soupContent = BeautifulSoup(cotent)
@@ -84,6 +83,16 @@ def parsePageAndGenDocFile(link):
     title = title.replace("?", "")
     document.save(title + '.docx')
 
+def getPageContent(link, req_header):
+        try :
+            req_timeout=1000
+            req=urllib2.Request(link, None, req_header)
+            resp=urllib2.urlopen(req, None, req_timeout)
+            html = resp.read()
+        except Exception,ex:
+            html = ""
+        html = unicode(html, "utf8")
+        return html
 
 if __name__ == '__main__':
     
